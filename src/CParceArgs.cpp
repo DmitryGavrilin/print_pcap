@@ -1,5 +1,6 @@
 #include "CParceArgs.h"
 #include <stdlib.h>
+#include <vector>
 
 CParceArgs::CParceArgs(int argc, char *argv[])
 {

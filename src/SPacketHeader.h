@@ -30,5 +30,4 @@ void SPacketHeader::print()
               << "   caplen = " << long(caplen) << std::endl
               << "   len = " << long(len) << std::endl
               << "}" << " sizeof(SPacketHeader) = " << sizeof(SPacketHeader) << std::endl;
-
 }

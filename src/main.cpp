@@ -1,8 +1,6 @@
 #include "CParceArgs.h"
 #include "CParcePcap.h"
 
-#include <iostream>
-
 int main(int argc, char *argv[])
 {
     CParceArgs * args = new CParceArgs(argc,argv);

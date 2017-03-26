@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include "utils.h"
 
 struct SPacketIpV4
 {
@@ -19,6 +20,7 @@ struct SPacketIpV4
 
     void clear();
     void print();
+    void convert();
 };
 
 struct SProtocolPacketIpV4
@@ -92,4 +94,12 @@ void SPacketIpV4::print()
                                         << int(ipDestination[3]) << "]" << std::endl
               << "}" << " sizeof(SPacketIpV4) = " << sizeof(SPacketIpV4) << std::endl;
 
+}
+
+void SPacketIpV4::convert()
+{
+    patch::swapEnd<uint16_t>(totalLength);
+    patch::swapEnd<uint16_t>(ipId);
+    patch::swapEnd<uint16_t>(fragmentOffset);
+    patch::swapEnd<uint16_t>(headerChecksum);
 }

@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <iostream>
+#include "utils.h"
+
 
 struct SPacketUDP
 {
@@ -12,7 +14,9 @@ struct SPacketUDP
 
     void clear();
     void print();
+    void convert();
 };
+
 
 void SPacketUDP::clear()
 {
@@ -30,4 +34,12 @@ void SPacketUDP::print()
               << "   length = " << long(length) << std::endl
               << "   headerChecksum = " << long(headerChecksum) << std::endl
               << "}" << " sizeof(SPacketUDP) = " << sizeof(SPacketUDP) << std::endl;
+}
+
+void SPacketUDP::convert()
+{
+    patch::swapEnd<uint16_t>(portSource);
+    patch::swapEnd<uint16_t>(portDestination);
+    patch::swapEnd<uint16_t>(length);
+    patch::swapEnd<uint16_t>(headerChecksum);
 }

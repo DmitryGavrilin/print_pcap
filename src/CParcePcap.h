@@ -4,6 +4,7 @@
 
 struct SPacketIpV4;
 struct SPacketUDP;
+struct SPacketHeader;
 
 class CParcePcap
 {
@@ -18,6 +19,5 @@ private:
 
     bool applyFilter(const SPacketIpV4 &ipv4, const SPacketUDP &udp);
     void skip(FILE * file, size_t size);
-    void printUDP(const SPacketIpV4 &ipv4, const SPacketUDP &udp, FILE * file, const size_t size);
-    void printData(FILE * file, const size_t size);
+    void printUDP(const SPacketHeader &header, const SPacketIpV4 &ipv4, const SPacketUDP &udp, FILE * file);
 };

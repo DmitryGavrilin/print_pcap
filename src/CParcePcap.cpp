@@ -35,20 +35,22 @@ void CParcePcap::parse()
             SPacketEthernet packetEthernet;
             if( sizeof(packetEthernet) != fread(&packetEthernet, 1, sizeof(packetEthernet), pcapFile_) )
                 break;
+            packetEthernet.convert();
             if(packetEthernet.typeProtocol == SProtocolEthernet::IP)
             {
                 SPacketIpV4 packetIpV4;
                 if( sizeof(packetIpV4) != fread(&packetIpV4, 1, sizeof(packetIpV4), pcapFile_) )
                     break;
+                packetIpV4.convert();
                 if(packetIpV4.protocolIpDatagram == SProtocolPacketIpV4::UDP)
                 {
                     SPacketUDP packetUDP;
                     if( sizeof(packetUDP) != fread(&packetUDP, 1, sizeof(packetUDP), pcapFile_) )
                         break;
+                    packetUDP.convert();
                     if(applyFilter(packetIpV4, packetUDP))
-                        printUDP(packetIpV4, packetUDP,pcapFile_,packetHeader.len-sizeof(packetEthernet)-sizeof(packetIpV4)-sizeof(packetUDP));
-                    else
-                        skip(pcapFile_,packetHeader.len-sizeof(packetEthernet)-sizeof(packetIpV4)-sizeof(packetUDP));
+                        printUDP(packetHeader, packetIpV4, packetUDP,pcapFile_);
+                    skip(pcapFile_,packetHeader.len-sizeof(packetEthernet)-sizeof(packetIpV4)-sizeof(packetUDP));
                 }
                 else
                     skip(pcapFile_, packetHeader.len-sizeof(packetEthernet)-sizeof(packetIpV4));
@@ -71,6 +73,15 @@ bool CParcePcap::applyFilter(const SPacketIpV4 &ipv4, const SPacketUDP &udp)
                 patch::to_string(ipv4.ipDestination[2])+"."+
                 patch::to_string(ipv4.ipDestination[3]);
         if(ip == ipFilter_)
+            return true;
+        else
+        {
+            return false;
+        }
+    }
+    if(ipFilter_ == "" && portFilter_ != 0)
+    {
+        if(int(udp.portDestination) == portFilter_)
             return true;
         else
         {
@@ -102,29 +113,13 @@ void CParcePcap::skip(FILE *file, size_t size)
     }
 }
 
-void CParcePcap::printUDP(const SPacketIpV4 &ipv4, const SPacketUDP &udp, FILE *file, const size_t size)
+void CParcePcap::printUDP(const SPacketHeader &header, const SPacketIpV4 &ipv4, const SPacketUDP &udp, FILE *file)
 {
-    printf("IP (Source): %d.%d.%d.%d:%d \n", ipv4.ipSource[0]
-            , ipv4.ipSource[1]
-            , ipv4.ipSource[2]
-            , ipv4.ipSource[3]
-            , udp.portSource);
-    printf("IP (Destination): %d.%d.%d.%d:%d \n", ipv4.ipDestination[0]
+    std::cout << patch::timestemp(header.tv_sec, header.tv_usec);
+    printf(" %d.%d.%d.%d ", ipv4.ipDestination[0]
             , ipv4.ipDestination[1]
             , ipv4.ipDestination[2]
-            , ipv4.ipDestination[3]
-            , udp.portDestination);
-    printData(file, size);
-}
-
-void CParcePcap::printData(FILE *file, const size_t size)
-{
-    uint8_t temp_;
-    std::cout << "Data: " << std::endl;
-    for (int var = 0; var < size; ++var)
-    {
-        fread(&temp_, 1, sizeof(temp_), file);
-        printf("%02x ", temp_);
-    }
-    std::cout << std::endl << std::endl;
+            , ipv4.ipDestination[3]);
+    printf("%d ", udp.portDestination );
+    printf("%d \n", udp.length-sizeof(udp) );
 }

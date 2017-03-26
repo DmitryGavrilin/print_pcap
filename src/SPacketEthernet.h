@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include "utils.h"
 
 struct SPacketEthernet
 {
@@ -11,28 +12,28 @@ struct SPacketEthernet
 
     void clear();
     void print();
+    void convert();
 };
 
 struct SProtocolEthernet
 {
     enum EProtocolEthernet
     {
-        IP = 8
-        //        PUP = 512,
-        //        SPRITE = 1280,
-        //        IP = 8,
-        //        ARP = 2054,
-        //        REVARP = 32821,
-        //        AT = 32923,
-        //        AARP = 33011,
-        //        VLAN = 33024,
-        //        IPX = 33079,
-        //        IPV6 = 34525,
-        //        LOOPBACK = 36864,
-        //        PPPOED = 34915,
-        //        PPPOES = 34916,
-        //        MPLS = 34887,
-        //        PPP = 34827
+        PUP = 512,
+        SPRITE = 1280,
+        IP = 2048,
+        ARP = 2054,
+        REVARP = 32821,
+        AT = 32923,
+        AARP = 33011,
+        VLAN = 33024,
+        IPX = 33079,
+        IPV6 = 34525,
+        LOOPBACK = 36864,
+        PPPOED = 34915,
+        PPPOES = 34916,
+        MPLS = 34887,
+        PPP = 34827
     };
 };
 
@@ -70,4 +71,9 @@ void SPacketEthernet::print()
                                          << int(macDestination[5]) << "]" << std::endl
               << "   typeProtocol = " << long(typeProtocol) << std::endl
               << "}" << " sizeof(SPacketEthernet) = " << sizeof(SPacketEthernet) << std::endl;
+}
+
+void SPacketEthernet::convert()
+{
+    patch::swapEnd<uint16_t>(typeProtocol);
 }
